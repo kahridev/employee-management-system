@@ -2,6 +2,7 @@ package com.mustafakahriman.employeemanagementsystem.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -99,8 +100,13 @@ public class EmployeeServiceTest {
         newEmployee.setSurname(oldEmployee.getSurname());
         newEmployee.setId(1L);
 
+        var newDepartment = new Department();
+        newDepartment.setId(2L);
+        newDepartment.setDepartmentName("Operations");
+
         when(employeeRepository.findById(oldEmployee.getId())).thenReturn(Optional.of(oldEmployee));
         when(employeeRepository.save(any(Employee.class))).thenReturn(newEmployee);
+        when(departmentService.getDepartment(any(Long.class))).thenReturn(newDepartment);
 
         var response = employeeService.updateEmployee(oldEmployee.getId(), request);
 
@@ -110,8 +116,7 @@ public class EmployeeServiceTest {
         softAssertions.assertThat(response.getName()).isEqualTo(oldEmployee.getName());
         softAssertions.assertThat(response.getPosition()).isEqualTo(oldEmployee.getPosition());
         softAssertions.assertThat(response.getSurname()).isEqualTo(oldEmployee.getSurname());
-        softAssertions.assertThat(response.getDepartment().getDepartmentName())
-                .isEqualTo(oldEmployee.getDepartment().getDepartmentName());
+        softAssertions.assertThat(response.getDepartment().getDepartmentName()).isEqualTo("Sales");
         softAssertions.assertAll();
 
         verify(employeeRepository).findById(oldEmployee.getId());
@@ -149,8 +154,14 @@ public class EmployeeServiceTest {
 
         doThrow(RuntimeException.class).when(employeeRepository).deleteById(employeeId);
 
-        employeeService.deleteEmployee(employeeId);
+        boolean exceptionOccured = false;
+        try {
+            employeeService.deleteEmployee(employeeId);
+        } catch (Exception e) {
+            exceptionOccured = true;
+        }
 
+        assertTrue(exceptionOccured);
         verify(employeeRepository).deleteById(employeeId);
     }
 

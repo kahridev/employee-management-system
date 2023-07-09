@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -39,7 +40,7 @@ public class Employee extends BaseEntity {
     @Column(name = "SALARY", nullable = false)
     private BigDecimal salary;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "DEPARTMENT_ID", referencedColumnName = "ID")
     @JsonManagedReference
     private Department department;
